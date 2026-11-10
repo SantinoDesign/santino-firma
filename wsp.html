@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Santino Design · WhatsApp</title>
+<script>
+// Celular: abre la app de WhatsApp. Computador: abre WhatsApp Web directo,
+// sin la pantalla intermedia de wa.me. El mensaje viene en ?t= o queda el de la firma.
+var NUM = "56955316124";
+var MSG = "Hola Harold, vengo de tu correo y quiero conversar un proyecto";
+function destino(ua, toques, query) {
+  var t = (query.match(/[?&]t=([^&]*)/) || [])[1];
+  var texto = t ? decodeURIComponent(t.replace(/\+/g, " ")) : MSG;
+  var celu = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (/Macintosh/.test(ua) && toques > 1);
+  return celu ? "https://wa.me/" + NUM + "?text=" + encodeURIComponent(texto)
+              : "https://web.whatsapp.com/send?phone=" + NUM + "&text=" + encodeURIComponent(texto);
+}
+if (typeof location !== "undefined" && typeof navigator !== "undefined")
+  location.replace(destino(navigator.userAgent, navigator.maxTouchPoints || 0, location.search));
+if (typeof module !== "undefined") module.exports = destino;
+</script>
+</head><body style="font-family:Arial,sans-serif;color:#474747;padding:24px">
+<p>Abriendo WhatsApp… Si no se abre, <a href="https://wa.me/56955316124" style="color:#0081A6">toca aquí</a>.</p>
+</body></html>
