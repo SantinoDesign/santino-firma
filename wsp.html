@@ -4,21 +4,41 @@
 <meta name="robots" content="noindex">
 <title>Santino Design · WhatsApp</title>
 <script>
-// Celular: abre la app de WhatsApp. Computador: abre WhatsApp Web directo,
-// sin la pantalla intermedia de wa.me. El mensaje viene en ?t= o queda el de la firma.
+// Celular: abre la app de WhatsApp con el esquema whatsapp:// (v2, 09-nov-2026). La v1 redirigía a wa.me por código
+// y en el iPhone no abría la app: iOS solo entrega wa.me a la app cuando la persona toca el enlace, no en una redirección.
+// Si el esquema no abre, queda el botón (un toque en wa.me sí abre la app).
+// Computador: WhatsApp Web directo, sin la pantalla intermedia de wa.me.
+// El mensaje viene en ?t= o queda el de la firma.
 var NUM = "56955316124";
 var MSG = "Hola Harold, vengo de tu correo y quiero conversar un proyecto";
 function destino(ua, toques, query) {
   var t = (query.match(/[?&]t=([^&]*)/) || [])[1];
-  var texto = t ? decodeURIComponent(t.replace(/\+/g, " ")) : MSG;
+  var texto = encodeURIComponent(t ? decodeURIComponent(t.replace(/\+/g, " ")) : MSG);
   var celu = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (/Macintosh/.test(ua) && toques > 1);
-  return celu ? "https://wa.me/" + NUM + "?text=" + encodeURIComponent(texto)
-              : "https://web.whatsapp.com/send?phone=" + NUM + "&text=" + encodeURIComponent(texto);
+  return {
+    celu: celu,
+    ir: celu ? "whatsapp://send?phone=" + NUM + "&text=" + texto
+             : "https://web.whatsapp.com/send?phone=" + NUM + "&text=" + texto,
+    boton: "https://wa.me/" + NUM + "?text=" + texto
+  };
 }
-if (typeof location !== "undefined" && typeof navigator !== "undefined")
-  location.replace(destino(navigator.userAgent, navigator.maxTouchPoints || 0, location.search));
 if (typeof module !== "undefined") module.exports = destino;
 </script>
-</head><body style="font-family:Arial,sans-serif;color:#474747;padding:24px">
-<p>Abriendo WhatsApp… Si no se abre, <a href="https://wa.me/56955316124" style="color:#0081A6">toca aquí</a>.</p>
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fff;
+       font-family:Arial,Helvetica,sans-serif;color:#474747;text-align:center;padding:24px;box-sizing:border-box}
+  p{margin:0 0 20px;font-size:16px;line-height:1.5}
+  a.btn{display:inline-block;background:#0081A6;color:#fff;text-decoration:none;font-size:17px;
+        padding:14px 28px;border-radius:6px}
+</style>
+</head><body>
+<div>
+  <p>Abriendo WhatsApp de Santino Design…</p>
+  <a class="btn" id="btn" href="https://wa.me/56955316124">Abrir WhatsApp</a>
+</div>
+<script>
+var d = destino(navigator.userAgent, navigator.maxTouchPoints || 0, location.search);
+document.getElementById("btn").href = d.celu ? d.boton : d.ir;
+if (d.celu) location.href = d.ir; else location.replace(d.ir);
+</script>
 </body></html>
